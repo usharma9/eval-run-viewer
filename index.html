@@ -119,6 +119,16 @@ pre.json .null { color: #999; }
 <script>
 const RUN_PATH = '/chat-retrieval/.eval_runs/branch/raw_outputs/' + CONFIG.runPath;
 
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+marked.setOptions({ breaks: false });
+const renderer = new marked.Renderer();
+renderer.html = () => '';
+marked.use({ renderer });
+
 const BADGE_MAP = {
   get_bonds_loans_screener_filters: 'screener',
   get_companies: 'companies',
@@ -149,8 +159,9 @@ function fmtCost(usage) {
 function syntaxHighlight(obj) {
   const raw = JSON.stringify(obj, null, 2);
   if (!raw) return '';
-  return raw.replace(/("(?:\\.|[^"\\])*")\s*:/g, '<span class="key">$1</span>:')
-    .replace(/:\s*("(?:\\.|[^"\\])*")/g, ': <span class="str">$1</span>')
+  const safe = esc(raw);
+  return safe.replace(/(&quot;(?:(?!&quot;).)*&quot;)\s*:/g, '<span class="key">$1</span>:')
+    .replace(/:\s*(&quot;(?:(?!&quot;).)*&quot;)/g, ': <span class="str">$1</span>')
     .replace(/:\s*(\d+\.?\d*)/g, ': <span class="num">$1</span>')
     .replace(/:\s*(true|false)/g, ': <span class="bool">$1</span>')
     .replace(/:\s*(null)/g, ': <span class="null">$1</span>');
@@ -175,15 +186,15 @@ function render(data) {
   // Header
   const h = document.getElementById('header');
   const errHtml = data.error
-    ? `<span class="status-err">✗ ${typeof data.error === 'string' ? data.error : 'Error'}</span>`
+    ? `<span class="status-err">✗ ${esc(typeof data.error === 'string' ? data.error : 'Error')}</span>`
     : '<span class="status-ok">✓ No errors</span>';
   h.innerHTML = `
-    <div class="header-item"><strong>Sample</strong> <span class="mono">${data.sample_id}</span></div>
-    <div class="header-item"><strong>Trial</strong> ${data.trial}</div>
+    <div class="header-item"><strong>Sample</strong> <span class="mono">${esc(data.sample_id)}</span></div>
+    <div class="header-item"><strong>Trial</strong> ${esc(data.trial)}</div>
     <div class="header-item"><strong>Time</strong> ${fmtTime(data.response_time)}</div>
     <div class="header-item"><strong>Tokens</strong> ${fmtNum(data.usage?.total_tokens)} (in: ${fmtNum(data.usage?.input_tokens)}, out: ${fmtNum(data.usage?.output_tokens)}) — <strong>$${fmtCost(data.usage)}</strong></div>
     <div class="header-item">${errHtml}</div>
-    ${data.trace_id ? `<div class="header-item"><strong>Trace</strong> <span class="mono">${data.trace_id}</span></div>` : ''}
+    ${data.trace_id ? `<div class="header-item"><strong>Trace</strong> <span class="mono">${esc(data.trace_id)}</span></div>` : ''}
   `;
 
   // Final output
@@ -241,9 +252,9 @@ function render(data) {
         <div class="tool-card-header" onclick="this.parentElement.classList.toggle('open')">
           <span class="arrow">▶</span>
           <span class="num">#${i + 1}</span>
-          <span class="badge ${badgeClass(tc.tool_name)}">${tc.tool_name}</span>
-          <span class="tool-summary">${summarizeInput(tc.input_args)} → ${status}</span>
-          <span class="tool-status ${statusCls}">${status}</span>
+          <span class="badge ${badgeClass(tc.tool_name)}">${esc(tc.tool_name)}</span>
+          <span class="tool-summary">${esc(summarizeInput(tc.input_args))} → ${esc(status)}</span>
+          <span class="tool-status ${statusCls}">${esc(status)}</span>
         </div>
         <div class="tool-card-body">${bodyHtml}</div>
       </div>`;
@@ -256,7 +267,7 @@ function render(data) {
   if (data.citations) {
     cs.innerHTML = '<h3>Citations</h3><div class="citations-grid">' +
       Object.entries(data.citations).map(([k, v]) =>
-        `<div class="citation-item"><div class="label">${k.replace(/_/g, ' ')}</div><div class="value">${v}</div></div>`
+        `<div class="citation-item"><div class="label">${esc(k.replace(/_/g, ' '))}</div><div class="value">${esc(v)}</div></div>`
       ).join('') + '</div>';
   }
 }
@@ -292,7 +303,7 @@ fetch(RUN_PATH + '?t=' + Date.now())
       <div class="error-icon">&#x26A0;</div>
       <div class="error-title">File not found</div>
       <div class="error-detail">Could not load the run file. Check that the path in <strong>config.js</strong> is correct.</div>
-      <div class="error-path">${RUN_PATH}</div>
+      <div class="error-path">${esc(RUN_PATH)}</div>
     `;
   });
 </script>
