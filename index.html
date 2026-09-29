@@ -117,7 +117,8 @@ pre.json .null { color: #999; }
 </div>
 
 <script>
-const RUN_PATH = '/chat-retrieval/.eval_runs/branch/raw_outputs/' + CONFIG.runPath;
+const inputParam = new URLSearchParams(window.location.search).get('input');
+const RUN_PATH = '/chat-retrieval/.eval_runs/branch/raw_outputs/' + (inputParam || CONFIG.runPath);
 
 function esc(s) {
   if (s == null) return '';
@@ -182,6 +183,7 @@ function summarizeInput(args) {
 function render(data) {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').style.display = '';
+  document.title = `Run: ${data.sample_id?.slice(0, 8)} t${data.trial}`;
 
   // Header
   const h = document.getElementById('header');
