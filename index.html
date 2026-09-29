@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Eval Run Viewer</title>
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -112,7 +113,7 @@ pre.json .null { color: #999; }
 </div>
 
 <script>
-const RUN_PATH = '/chat-retrieval/.eval_runs/branch/raw_outputs/89829373-12e9-45be-b605-954b93cf06d3_trial_1.json';
+const RUN_PATH = '/chat-retrieval/.eval_runs/branch/raw_outputs/' + CONFIG.runPath;
 
 const BADGE_MAP = {
   get_bonds_loans_screener_filters: 'screener',
@@ -133,6 +134,12 @@ function fmtTime(seconds) {
 
 function fmtNum(n) {
   return n != null ? n.toLocaleString() : '—';
+}
+
+function fmtCost(usage) {
+  if (!usage) return '—';
+  const cost = (usage.input_tokens / 1e6) * CONFIG.inputCostPerMillionTokens + (usage.output_tokens / 1e6) * CONFIG.outputCostPerMillionTokens;
+  return cost.toFixed(2);
 }
 
 function syntaxHighlight(obj) {
@@ -170,7 +177,7 @@ function render(data) {
     <div class="header-item"><strong>Sample</strong> <span class="mono">${data.sample_id}</span></div>
     <div class="header-item"><strong>Trial</strong> ${data.trial}</div>
     <div class="header-item"><strong>Time</strong> ${fmtTime(data.response_time)}</div>
-    <div class="header-item"><strong>Tokens</strong> ${fmtNum(data.usage?.total_tokens)} (in: ${fmtNum(data.usage?.input_tokens)}, out: ${fmtNum(data.usage?.output_tokens)})</div>
+    <div class="header-item"><strong>Tokens</strong> ${fmtNum(data.usage?.total_tokens)} (in: ${fmtNum(data.usage?.input_tokens)}, out: ${fmtNum(data.usage?.output_tokens)}) — <strong>$${fmtCost(data.usage)}</strong></div>
     <div class="header-item">${errHtml}</div>
     ${data.trace_id ? `<div class="header-item"><strong>Trace</strong> <span class="mono">${data.trace_id}</span></div>` : ''}
   `;
