@@ -94,7 +94,11 @@ pre.json .null { color: #999; }
 .citation-item .value { font-weight: 600; font-size: 18px; }
 
 #loading { text-align: center; padding: 60px; color: #999; }
-#error { text-align: center; padding: 60px; color: #dc2626; display: none; }
+#error { padding: 80px 40px; display: none; text-align: center; }
+#error .error-icon { font-size: 64px; margin-bottom: 16px; }
+#error .error-title { font-size: 22px; font-weight: 700; color: #dc2626; margin-bottom: 8px; }
+#error .error-detail { font-size: 14px; color: #555; margin-bottom: 20px; }
+#error .error-path { font-family: "SF Mono", "Fira Code", "Consolas", monospace; font-size: 13px; background: #fef2f2; border: 1px solid #fecaca; padding: 10px 16px; border-radius: 6px; display: inline-block; color: #991b1b; }
 </style>
 </head>
 <body>
@@ -283,8 +287,13 @@ fetch(RUN_PATH + '?t=' + Date.now())
   .catch(e => {
     document.getElementById('loading').style.display = 'none';
     const el = document.getElementById('error');
-    el.style.display = '';
-    el.textContent = `Failed to load: ${e.message}. Serve from repo root: python -m http.server`;
+    el.style.display = 'block';
+    el.innerHTML = `
+      <div class="error-icon">&#x26A0;</div>
+      <div class="error-title">File not found</div>
+      <div class="error-detail">Could not load the run file. Check that the path in <strong>config.js</strong> is correct.</div>
+      <div class="error-path">${RUN_PATH}</div>
+    `;
   });
 </script>
 </body>
