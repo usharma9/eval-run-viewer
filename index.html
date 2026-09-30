@@ -114,7 +114,7 @@ pre.json .null { color: #999; }
 
 <script>
 const inputParam = new URLSearchParams(window.location.search).get('input');
-const RUN_PATH = CONFIG.runBasePath + (inputParam || CONFIG.defaultEvalFilename);
+const RUN_PATH = CONFIG.evalOutputDir + (inputParam || CONFIG.defaultEvalFilename);
 
 function esc(s) {
   if (s == null) return '';
