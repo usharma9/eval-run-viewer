@@ -25,3 +25,10 @@ Either change `defaultEvalFilename` in `config.js`, or pass it as a query param:
 ```
 http://localhost:8766/index.html?input=8fa4025a-3693-4f09-a798-8f4abeabac0c_trial_1.json
 ```
+
+## Screenshots
+Output
+![output.png](example_screenshots/output.png)
+
+Tool calls (query and response)
+![tool_calls.png](example_screenshots/tool_calls.png)
