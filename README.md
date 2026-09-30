@@ -1,32 +1,30 @@
 # Eval Run Viewer
 
-Displays eval run JSON output files in a readable format.
+View eval run JSON output files as a readable report with rendered markdown and expandable tool calls.
 
-## `config.js` file
+## Quick start
 
-- `evalOutputDir` — absolute path to the directory containing eval run JSON files. Set this to the `.eval_runs` folder in your local chat-retrieval repo. 
-- `defaultEvalFilename` — the file loaded when no `?input=` query param is given. Not important if you will use the query param – it's just a default.
+1. Edit `config.js` — set `evalOutputDir` to the absolute path of your local `.eval_runs/branch/raw_outputs/` directory:
+   ```js
+   evalOutputDir: '/path/to/chat-retrieval/.eval_runs/branch/raw_outputs/',
+   ```
 
-## Usage
-Set `evalOutputDir` and `defaultEvalFilename`.
+2. Start the server:
+   ```sh
+   python3 server.py
+   ```
 
+3. Open http://localhost:8766/index.html
 
-Run server
-```sh
-python3 server.py
-```
-
-Then open http://localhost:8766/index.html. Ctrl+C to stop.
-
-## Viewing a different file
-
-Either change `defaultEvalFilename` in `config.js`, or pass it as a query param:
-
+To view a different file, pass the filename as a query param:
 ```
 http://localhost:8766/index.html?input=8fa4025a-3693-4f09-a798-8f4abeabac0c_trial_1.json
 ```
 
+Ctrl+C to stop the server.
+
 ## Screenshots
+
 Output
 ![output.png](example_screenshots/output.png)
 
