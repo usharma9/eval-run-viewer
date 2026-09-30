@@ -53,10 +53,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 .tool-card-header .num { color: #999; font-family: monospace; min-width: 32px; }
 
 .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; font-family: monospace; color: #fff; }
-.badge-screener { background: #7c3aed; }
-.badge-companies { background: #2563eb; }
-.badge-news { background: #d97706; }
-.badge-default { background: #6b7280; }
 
 .tool-status { font-size: 11px; font-weight: 600; margin-left: auto; flex-shrink: 0; }
 
@@ -118,7 +114,8 @@ pre.json .null { color: #999; }
 
 <script>
 const inputParam = new URLSearchParams(window.location.search).get('input');
-const RUN_PATH = '/chat-retrieval/.eval_runs/branch/raw_outputs/' + (inputParam || CONFIG.runPath);
+const fullPath = CONFIG.runBasePath + (inputParam || CONFIG.runPath);
+const RUN_PATH = CONFIG.serverRoot ? fullPath.replace(CONFIG.serverRoot, '') : fullPath;
 
 function esc(s) {
   if (s == null) return '';
@@ -130,14 +127,15 @@ const renderer = new marked.Renderer();
 renderer.html = () => '';
 marked.use({ renderer });
 
-const BADGE_MAP = {
-  get_bonds_loans_screener_filters: 'screener',
-  get_companies: 'companies',
-  get_latest_news: 'news',
-};
-
-function badgeClass(toolName) {
-  return 'badge-' + (BADGE_MAP[toolName] || 'default');
+const BADGE_COLORS = ['#7c3aed','#2563eb','#d97706','#059669','#dc2626','#0891b2','#c026d3','#ea580c'];
+const badgeColorCache = {};
+function badgeColor(toolName) {
+  if (!badgeColorCache[toolName]) {
+    let h = 0;
+    for (let i = 0; i < toolName.length; i++) h = (h * 31 + toolName.charCodeAt(i)) | 0;
+    badgeColorCache[toolName] = BADGE_COLORS[Math.abs(h) % BADGE_COLORS.length];
+  }
+  return badgeColorCache[toolName];
 }
 
 function fmtTime(seconds) {
@@ -254,7 +252,7 @@ function render(data) {
         <div class="tool-card-header" onclick="this.parentElement.classList.toggle('open')">
           <span class="arrow">▶</span>
           <span class="num">#${i + 1}</span>
-          <span class="badge ${badgeClass(tc.tool_name)}">${esc(tc.tool_name)}</span>
+          <span class="badge" style="background:${badgeColor(tc.tool_name)}">${esc(tc.tool_name)}</span>
           <span class="tool-summary">${esc(summarizeInput(tc.input_args))} → ${esc(status)}</span>
           <span class="tool-status ${statusCls}">${esc(status)}</span>
         </div>
