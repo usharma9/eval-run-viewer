@@ -1,3 +1,6 @@
+> [!WARNING]
+> This is an entirely vibe-coded tool made for personal use.
+
 # Eval Run Viewer
 
 View eval run JSON output files as a readable report with rendered markdown and expandable tool calls.
