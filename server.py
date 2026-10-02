@@ -13,5 +13,6 @@ class Handler(SimpleHTTPRequestHandler):
         return clean
 
 
-print("http://localhost:8766/index.html")
-HTTPServer(("", 8766), Handler).serve_forever()
+if __name__ == "__main__":
+    print("http://localhost:8766/index.html")
+    HTTPServer(("", 8766), Handler).serve_forever()

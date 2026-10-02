@@ -5,7 +5,7 @@
 
 View eval run JSON output files as a readable report with rendered markdown and expandable tool calls.
 
-## Quick start
+## Usage
 
 1. Edit `config.js` — set `evalOutputDir` to the absolute path of your local `.eval_runs/branch/raw_outputs/` directory:
    ```js
@@ -14,8 +14,9 @@ View eval run JSON output files as a readable report with rendered markdown and 
 
 2. Start the server:
    ```sh
-   python3 server.py
+   uv run server.py
    ```
+[Install uv](https://docs.astral.sh/uv/#installation) if you don't have it already.
 
 3. Open http://localhost:8766/index.html
 
