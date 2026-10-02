@@ -9,7 +9,7 @@ View eval run JSON output files as a readable report with rendered markdown and 
 
 1. Edit `config.js` — set `evalOutputDir` to the absolute path of your local `.eval_runs/branch/raw_outputs/` directory:
    ```js
-   evalOutputDir: '/path/to/chat-retrieval/.eval_runs/branch/raw_outputs/',
+   evalOutputDir: '/Users/uttam/Documents/Work/chat-retrieval/.eval_runs/branch/raw_outputs/'
    ```
 
 2. Start the server:
