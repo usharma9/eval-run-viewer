@@ -17,7 +17,7 @@ View eval run JSON output files as a readable report with rendered markdown and 
    uv run server.py
    ```
 
-3. Open http://localhost:8766/index.html
+3. Open http://localhost:8766
 
 Pick a file from the dropdown at the top (newest first) to view it — the list
 refreshes every few seconds, so a new run shows up without reloading the
