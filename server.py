@@ -25,14 +25,17 @@ def index():
 
 @app.get("/api/files")
 def list_files():
-    files = sorted(
+    """
+    Used by the file selection dropdown.
+    """
+    latest_files = sorted(
         eval_output_dir().glob("*.json"),
         key=lambda f: f.stat().st_mtime,
         reverse=True,
     )
     return [
         {"name": f.name, "mtime": f.stat().st_mtime}
-        for f in files[:FILE_LIST_MAX_ITEMS]
+        for f in latest_files[:FILE_LIST_MAX_ITEMS]
     ]
 
 
