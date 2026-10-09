@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 VIEWER_DIR = Path(__file__).resolve().parent
-
+FILE_LIST_MAX_ITEMS = 15
 
 def eval_output_dir():
     config = (VIEWER_DIR / "config.js").read_text()
@@ -34,7 +34,7 @@ class Handler(SimpleHTTPRequestHandler):
             reverse=True,
         )
         body = json.dumps(
-            [{"name": f.name, "mtime": f.stat().st_mtime} for f in files]
+            [{"name": f.name, "mtime": f.stat().st_mtime} for f in files[:FILE_LIST_MAX_ITEMS]]
         ).encode()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
