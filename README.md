@@ -1,5 +1,5 @@
 > [!WARNING]
-> This is an entirely vibe-coded tool made for personal use.
+> This is an entirely vibe-coded tool so beware of the SLOP
 
 # Eval Run Viewer
 
@@ -19,9 +19,9 @@ View eval run JSON output files as a readable report with rendered markdown and 
 
 3. Open http://localhost:8766
 
-Pick a file from the dropdown at the top (newest first) to view it — the list
-refreshes every few seconds, so a new run shows up without reloading the
-page. You can still deep-link with `?input=<filename>`.
+The latest run will be loaded. You can also pick a file from the dropdown at the top (newest first) to view it — the list
+refreshes every 5 seconds and contains the 15 latest files.
+You can still deep-link with URL query param `?input=<filename>`.
 
 Ctrl+C to stop the server.
 
