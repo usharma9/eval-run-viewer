@@ -10,14 +10,18 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.5; }
 
-.header { background: #fafafa; border-bottom: 1px solid #e0e0e0; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; position: sticky; top: 0; z-index: 10; }
+.file-bar { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 10px 24px; display: flex; gap: 10px; align-items: center; position: sticky; top: 0; z-index: 11; }
+.file-bar label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+.file-bar select { font-size: 13px; padding: 5px 8px; border: 1px solid #d0d0d0; border-radius: 4px; background: #fff; max-width: 500px; }
+
+.header { background: #fafafa; border-bottom: 1px solid #e0e0e0; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; position: sticky; top: 37px; z-index: 10; }
 .header-item { font-size: 13px; color: #555; }
 .header-item strong { color: #1a1a1a; font-weight: 600; }
 .header-item .mono { font-family: "SF Mono", "Fira Code", "Consolas", monospace; font-size: 12px; }
 .status-ok { color: #16a34a; }
 .status-err { color: #dc2626; }
 
-.tabs { display: flex; border-bottom: 1px solid #e0e0e0; background: #fafafa; padding: 0 24px; position: sticky; top: 53px; z-index: 9; }
+.tabs { display: flex; border-bottom: 1px solid #e0e0e0; background: #fafafa; padding: 0 24px; position: sticky; top: 90px; z-index: 9; }
 .tab { padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 500; color: #666; border-bottom: 2px solid transparent; transition: all 0.15s; }
 .tab:hover { color: #1a1a1a; }
 .tab.active { color: #1a1a1a; border-bottom-color: #1a1a1a; }
@@ -99,6 +103,10 @@ pre.json .null { color: #999; }
 </head>
 <body>
 
+<div class="file-bar">
+  <label for="file-select">File</label>
+  <select id="file-select" onchange="loadRun(this.value)"></select>
+</div>
 <div id="loading">Loading run data…</div>
 <div id="error"></div>
 <div id="app" style="display:none">
@@ -113,8 +121,7 @@ pre.json .null { color: #999; }
 </div>
 
 <script>
-const inputParam = new URLSearchParams(window.location.search).get('input');
-const RUN_PATH = CONFIG.evalOutputDir + (inputParam || CONFIG.defaultEvalFilename);
+let currentFilename = new URLSearchParams(window.location.search).get('input') || CONFIG.defaultEvalFilename;
 
 function esc(s) {
   if (s == null) return '';
@@ -179,6 +186,7 @@ function summarizeInput(args) {
 
 function render(data) {
   document.getElementById('loading').style.display = 'none';
+  document.getElementById('error').style.display = 'none';
   document.getElementById('app').style.display = '';
   document.title = `Run: ${data.sample_id?.slice(0, 8)} t${data.trial}`;
 
@@ -287,24 +295,45 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// Fetch
-// cd /Users/uttam/Documents/Work && python -m http.server 8765
-// open http://localhost:8765/playground/agent_run_viewer/index.html
+function loadRun(filename) {
+  currentFilename = filename;
+  const url = new URL(window.location);
+  url.searchParams.set('input', filename);
+  history.replaceState(null, '', url);
 
-fetch(RUN_PATH + '?t=' + Date.now())
-  .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-  .then(render)
-  .catch(e => {
-    document.getElementById('loading').style.display = 'none';
-    const el = document.getElementById('error');
-    el.style.display = 'block';
-    el.innerHTML = `
-      <div class="error-icon">&#x26A0;</div>
-      <div class="error-title">File not found</div>
-      <div class="error-detail">Could not load the run file. Check that the path in <strong>config.js</strong> is correct.</div>
-      <div class="error-path">${esc(RUN_PATH)}</div>
-    `;
-  });
+  fetch(CONFIG.evalOutputDir + filename + '?t=' + Date.now())
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(render)
+    .catch(e => {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('app').style.display = 'none';
+      const el = document.getElementById('error');
+      el.style.display = 'block';
+      el.innerHTML = `
+        <div class="error-icon">&#x26A0;</div>
+        <div class="error-title">File not found</div>
+        <div class="error-detail">Could not load the run file. Check that the path in <strong>config.js</strong> is correct.</div>
+        <div class="error-path">${esc(CONFIG.evalOutputDir + filename)}</div>
+      `;
+    });
+}
+
+function refreshFileList() {
+  fetch('/api/files?t=' + Date.now())
+    .then(r => r.json())
+    .then(files => {
+      const select = document.getElementById('file-select');
+      if (!files.includes(currentFilename)) files.unshift(currentFilename);
+      const optionsHtml = files.map(f => `<option value="${esc(f)}">${esc(f)}</option>`).join('');
+      if (select.innerHTML !== optionsHtml) select.innerHTML = optionsHtml;
+      select.value = currentFilename;
+    })
+    .catch(() => {});
+}
+
+refreshFileList();
+setInterval(refreshFileList, 5000);
+loadRun(currentFilename);
 </script>
 </body>
 </html>

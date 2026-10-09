@@ -19,10 +19,9 @@ View eval run JSON output files as a readable report with rendered markdown and 
 
 3. Open http://localhost:8766/index.html
 
-To view a different file, pass the filename as a query param:
-```
-http://localhost:8766/index.html?input=8fa4025a-3693-4f09-a798-8f4abeabac0c_trial_1.json
-```
+Pick a file from the dropdown at the top (newest first) to view it — the list
+refreshes every few seconds, so a new run shows up without reloading the
+page. You can still deep-link with `?input=<filename>`.
 
 Ctrl+C to stop the server.
 
