@@ -318,13 +318,38 @@ function loadRun(filename) {
     });
 }
 
+function ordinal(n) {
+  if (n % 10 === 1 && n % 100 !== 11) return n + 'st';
+  if (n % 10 === 2 && n % 100 !== 12) return n + 'nd';
+  if (n % 10 === 3 && n % 100 !== 13) return n + 'rd';
+  return n + 'th';
+}
+
+function runLabel(mtime) {
+  const d = new Date(mtime * 1000);
+  const month = d.toLocaleString('en-GB', { month: 'short' });
+  let hours = d.getHours();
+  const ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12 || 12;
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${ordinal(d.getDate())} ${month} - ${hours}:${minutes}${ampm}`;
+}
+
 function refreshFileList() {
   fetch('/api/files?t=' + Date.now())
     .then(r => r.json())
     .then(files => {
       const select = document.getElementById('file-select');
-      if (!files.includes(currentFilename)) files.unshift(currentFilename);
-      const optionsHtml = files.map(f => `<option value="${esc(f)}">${esc(f)}</option>`).join('');
+      if (!files.some(f => f.name === currentFilename)) {
+        files.unshift({ name: currentFilename, mtime: null });
+      }
+      const total = files.length;
+      const optionsHtml = files.map((f, i) => {
+        const label = f.mtime
+          ? `Run ${total - i} (${runLabel(f.mtime)})`
+          : f.name;
+        return `<option value="${esc(f.name)}">${esc(label)}</option>`;
+      }).join('');
       if (select.innerHTML !== optionsHtml) select.innerHTML = optionsHtml;
       select.value = currentFilename;
     })

@@ -33,7 +33,9 @@ class Handler(SimpleHTTPRequestHandler):
             key=lambda f: f.stat().st_mtime,
             reverse=True,
         )
-        body = json.dumps([f.name for f in files]).encode()
+        body = json.dumps(
+            [{"name": f.name, "mtime": f.stat().st_mtime} for f in files]
+        ).encode()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
