@@ -27,11 +27,7 @@ def index():
 
 @app.get("/api/config")
 def get_config():
-    return {
-        "defaultEvalFilename": config["default_eval_filename"],
-        "inputCostPerMillionTokens": config["cost_per_million_tokens"]["input"],
-        "outputCostPerMillionTokens": config["cost_per_million_tokens"]["output"],
-    }
+    return config
 
 
 @app.get("/api/files")

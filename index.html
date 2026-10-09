@@ -157,7 +157,7 @@ function fmtNum(n) {
 
 function fmtCost(usage) {
   if (!usage) return '—';
-  const cost = (usage.input_tokens / 1e6) * CONFIG.inputCostPerMillionTokens + (usage.output_tokens / 1e6) * CONFIG.outputCostPerMillionTokens;
+  const cost = (usage.input_tokens / 1e6) * CONFIG.cost_per_million_tokens.input + (usage.output_tokens / 1e6) * CONFIG.cost_per_million_tokens.output;
   return cost.toFixed(2);
 }
 
@@ -312,7 +312,7 @@ function loadRun(filename) {
       el.innerHTML = `
         <div class="error-icon">&#x26A0;</div>
         <div class="error-title">File not found</div>
-        <div class="error-detail">Could not load the run file. Check that the path in <strong>config.js</strong> is correct.</div>
+        <div class="error-detail">Could not load the run file. Check that the path in <strong>config.toml</strong> is correct.</div>
         <div class="error-path">${esc(filename)}</div>
       `;
     });
@@ -358,7 +358,7 @@ function refreshFileList() {
 
 fetch('/api/config').then(r => r.json()).then(cfg => {
   CONFIG = cfg;
-  currentFilename = new URLSearchParams(window.location.search).get('input') || CONFIG.defaultEvalFilename;
+  currentFilename = new URLSearchParams(window.location.search).get('input') || CONFIG.default_eval_filename;
   refreshFileList();
   setInterval(refreshFileList, 5000);
   loadRun(currentFilename);
