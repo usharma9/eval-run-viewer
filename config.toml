@@ -1,0 +1,7 @@
+eval_output_dir = "/Users/uttam/Documents/Work/chat-retrieval/.eval_runs/branch/raw_outputs/"
+default_eval_filename = "89829373-12e9-45be-b605-954b93cf06d3_trial_1.json"
+
+# Opus 4.6 costs below. For calculating the cost per run.
+[cost_per_million_tokens]
+input = 5
+output = 25

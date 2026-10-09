@@ -1,48 +1,58 @@
-import json
-import re
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+import tomllib
 from pathlib import Path
-from urllib.parse import urlparse
+
+import uvicorn
+from fastapi import FastAPI
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 VIEWER_DIR = Path(__file__).resolve().parent
 FILE_LIST_MAX_ITEMS = 15
 
-def eval_output_dir():
-    config = (VIEWER_DIR / "config.js").read_text()
-    match = re.search(r"evalOutputDir:\s*'([^']+)'", config)
-    return Path(match.group(1))
+
+def load_config():
+    with open(VIEWER_DIR / "config.toml", "rb") as f:
+        return tomllib.load(f)
 
 
-class Handler(SimpleHTTPRequestHandler):
-    def translate_path(self, path):
-        clean = path.split("?")[0]
-        local = VIEWER_DIR / clean.lstrip("/")
-        if local.is_file():
-            return str(local)
-        return clean
+config = load_config()
 
-    def do_GET(self):
-        if urlparse(self.path).path == "/api/files":
-            self.send_file_list()
-            return
-        super().do_GET()
+app = FastAPI()
 
-    def send_file_list(self):
-        files = sorted(
-            eval_output_dir().glob("*.json"),
-            key=lambda f: f.stat().st_mtime,
-            reverse=True,
-        )
-        body = json.dumps(
-            [{"name": f.name, "mtime": f.stat().st_mtime} for f in files[:FILE_LIST_MAX_ITEMS]]
-        ).encode()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
 
+@app.get("/")
+def index():
+    return FileResponse(VIEWER_DIR / "index.html")
+
+
+@app.get("/api/config")
+def get_config():
+    return config
+
+
+@app.get("/api/files")
+def list_files():
+    eval_output_dir = Path(config["eval_output_dir"])
+    latest_files = sorted(
+        eval_output_dir.glob("*.json"),
+        key=lambda f: f.stat().st_mtime,
+        reverse=True,
+    )
+    return [
+        {"name": f.name, "mtime": f.stat().st_mtime}
+        for f in latest_files[:FILE_LIST_MAX_ITEMS]
+    ]
+
+
+@app.get("/api/run/{filename}")
+def get_run(filename: str):
+    path = Path(config["eval_output_dir"]) / filename
+    if not path.is_file() or not path.name.endswith(".json"):
+        return JSONResponse({"error": "not found"}, status_code=404)
+    return FileResponse(path)
+
+
+app.mount("/", StaticFiles(directory=VIEWER_DIR), name="static")
 
 if __name__ == "__main__":
-    print("http://localhost:8766/index.html")
-    HTTPServer(("", 8766), Handler).serve_forever()
+    uvicorn.run(app, port=8766)
