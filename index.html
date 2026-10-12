@@ -301,7 +301,7 @@ function loadRun(filename) {
   url.searchParams.set('input', filename);
   history.replaceState(null, '', url);
 
-  fetch('/api/run/' + encodeURIComponent(filename) + '?t=' + Date.now())
+  fetch('/api/run/' + encodeURIComponent(filename))
     .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
     .then(render)
     .catch(e => {
@@ -336,7 +336,7 @@ function runLabel(mtime) {
 }
 
 function refreshFileList() {
-  fetch('/api/files?t=' + Date.now())
+  fetch('/api/files')
     .then(r => r.json())
     .then(files => {
       const select = document.getElementById('file-select');
@@ -360,7 +360,7 @@ fetch('/api/config').then(r => r.json()).then(cfg => {
   CONFIG = cfg;
   currentFilename = new URLSearchParams(window.location.search).get('input') || CONFIG.default_eval_filename;
   refreshFileList();
-  setInterval(refreshFileList, 5000);
+  setInterval(refreshFileList, 10000);
   loadRun(currentFilename);
 });
 </script>
