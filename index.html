@@ -178,7 +178,7 @@ function summarizeInput(args) {
   if (entries.length === 0) return '{}';
   const parts = entries.slice(0, 2).map(([k, v]) => {
     const val = typeof v === 'string' ? `"${v.length > 30 ? v.slice(0, 30) + '…' : v}"` :
-                Array.isArray(v) ? `[${v.length}]` : JSON.stringify(v);
+                Array.isArray(v) ? `[${v}]` : JSON.stringify(v);
     return `${k}: ${val}`;
   });
   return '{' + parts.join(', ') + (entries.length > 2 ? ', …' : '') + '}';
@@ -260,7 +260,7 @@ function render(data) {
           <span class="arrow">▶</span>
           <span class="num">#${i + 1}</span>
           <span class="badge" style="background:${badgeColor(tc.tool_name)}">${esc(tc.tool_name)}</span>
-          <span class="tool-summary">${esc(summarizeInput(tc.input_args))} → ${esc(status)}</span>
+          <span class="tool-summary">${esc(summarizeInput(tc.input_args))}</span>
           ${tc.duration_ms != null ? `<span class="tool-duration">${(tc.duration_ms / 1000).toFixed(1)}s</span>` : ''}
           <span class="tool-status ${statusCls}">${esc(status)}</span>
         </div>
