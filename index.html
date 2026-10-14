@@ -177,8 +177,7 @@ function summarizeInput(args) {
   const entries = Object.entries(args);
   if (entries.length === 0) return '{}';
   const parts = entries.slice(0, 2).map(([k, v]) => {
-    const val = typeof v === 'string' ? `"${v.length > 30 ? v.slice(0, 30) + '…' : v}"` :
-                Array.isArray(v) ? `[${v}]` : JSON.stringify(v);
+    const val = typeof v === 'string' ? `"${v.length > 30 ? v.slice(0, 30) + '…' : v}"` : JSON.stringify(v);
     return `${k}: ${val}`;
   });
   return '{' + parts.join(', ') + (entries.length > 2 ? ', …' : '') + '}';
