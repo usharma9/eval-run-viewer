@@ -18,12 +18,12 @@ View eval run JSON output files as a readable report with rendered markdown and 
    eval_output_dir = "/Users/uttam/Documents/Work/chat-retrieval/.eval_runs/branch/raw_outputs/"
    ```
 
-3. Start the server. [Install uv](https://docs.astral.sh/uv/#installation) if you don't have it already.
+4. Start the server. [Install uv](https://docs.astral.sh/uv/#installation) if you don't have it already.
    ```sh
    uv run server.py
    ```
 
-4. Open http://localhost:8766
+5. Go to http://localhost:8766
 
 The latest run will be loaded. You can also pick a file from the dropdown at the top (newest first) to view it — the list
 refreshes every 5 seconds and contains the 15 latest files.
